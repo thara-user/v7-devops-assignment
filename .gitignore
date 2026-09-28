@@ -1,0 +1,32 @@
+# Private keys and credentials
+*.key
+*.pem
+*.p12
+*.pfx
+id_rsa
+id_ed25519
+id_*
+authorized_keys
+
+# Environment/secrets
+.env
+.env.*
+*.secret
+vault-password*
+.vault-password
+
+# Backups - may contain SSH/TLS private material
+backup/
+
+# Local/runtime
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.log
+
+# Editor/OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

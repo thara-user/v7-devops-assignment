@@ -1,0 +1,49 @@
+---
+- name: Install Nginx
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+    update_cache: yes
+
+- name: Create Nginx web page
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: /var/www/html/index.html
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload Nginx
+
+- name: Configure VM1 Nginx
+  ansible.builtin.template:
+    src: vm1.conf.j2
+    dest: /etc/nginx/sites-available/default
+    owner: root
+    group: root
+    mode: '0644'
+  when: inventory_hostname == "vm1"
+  notify: Reload Nginx
+
+- name: Configure VM2 and VM3 Nginx
+  ansible.builtin.template:
+    src: vm23.conf.j2
+    dest: /etc/nginx/sites-available/default
+    owner: root
+    group: root
+    mode: '0644'
+  when: inventory_hostname in ["vm2", "vm3"]
+  notify: Reload Nginx
+
+- name: Validate Nginx configuration
+  ansible.builtin.command: nginx -t
+  changed_when: false
+
+- name: Check whether Nginx is running
+  ansible.builtin.shell: pgrep -x nginx
+  register: nginx_process
+  failed_when: false
+  changed_when: false
+
+- name: Start Nginx if it is not running
+  ansible.builtin.command: nginx
+  when: nginx_process.rc != 0

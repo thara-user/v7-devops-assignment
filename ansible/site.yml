@@ -1,0 +1,9 @@
+---
+- name: Base setup for all V7 DevOps VMs
+  hosts: all
+  become: true
+
+  roles:
+  - common
+  - ssh
+  - nginx

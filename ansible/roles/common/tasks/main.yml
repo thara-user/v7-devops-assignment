@@ -1,0 +1,33 @@
+---
+- name: Install required packages
+  ansible.builtin.apt:
+    name:
+      - curl
+      - git
+      - sudo
+      - docker.io
+    state: present
+    update_cache: yes
+
+- name: Create ansible_user
+  ansible.builtin.user:
+    name: ansible_user
+    shell: /bin/bash
+    groups: sudo
+    append: yes
+    create_home: yes
+
+- name: Configure passwordless sudo for ansible_user
+  ansible.builtin.copy:
+    dest: /etc/sudoers.d/ansible_user
+    content: "ansible_user ALL=(ALL) NOPASSWD:ALL\n"
+    owner: root
+    group: root
+    mode: '0440'
+
+- name: Verify Vault secret is available
+  ansible.builtin.assert:
+    that:
+      - vault_demo_secret is defined
+    fail_msg: "Vault secret was not loaded"
+    success_msg: "Ansible Vault secret loaded successfully"

@@ -1,0 +1,31 @@
+---
+- name: Ensure ansible_user has SSH key
+  ansible.posix.authorized_key:
+    user: ansible_user
+    state: present
+    key: "{{ lookup('file', '/home/ittth/.ssh/v7_devops_key.pub') }}"
+
+- name: Disable SSH password authentication
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PasswordAuthentication'
+    line: 'PasswordAuthentication no'
+    create: false
+
+- name: Disable direct root SSH login
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PermitRootLogin'
+    line: 'PermitRootLogin no'
+    create: false
+
+- name: Enable SSH public key authentication
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PubkeyAuthentication'
+    line: 'PubkeyAuthentication yes'
+    create: false
+
+- name: Validate SSH configuration
+  ansible.builtin.command: sshd -t
+  changed_when: false
